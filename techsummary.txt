@@ -1,0 +1,18 @@
+Executive Summary: Enabling Hardware-Accelerated PS2 Emulation (ARMSX2) on Legacy RK3326 Handhelds (R36S / ArkOS)
+
+1. Problem Statement & Technical Bottleneck
+
+• Hardware/OS Constraint: The R36S handheld (Rockchip RK3326 / Mali-G31) runs ArkOS on a legacy BSP kernel (UK 11.7) with glibc 2.30, lacking mainline Panfrost DRM drivers and SYNC_FD kernel synchronization.
+• Application Requirement: ARMSX2 requires glibc 2.34+ and a modern Vulkan 1.1+ pipeline. Standard Mesa panvk fails without mainline DRM, while running inside Weston (westonwrap.sh) deadlocks /dev/mali0 or fails due to missing Linux Wayland WSI extensions.
+
+2. Solution Architecture (Zero-Compositor Hardware Bridge)
+
+• User-Space Isolation: Deployed ARMSX2 inside a nested AnylinuxARM64 (sharun) container environment to satisfy glibc 2.34+ dependencies on top of ArkOS (glibc 2.30).
+• Kernel-to-Vulkan Translation: Utilized malisx2 (v0.6.1+) to translate Vulkan calls directly to /dev/mali0 (UK 11.7 48-byte Job Manager atoms), bypassing proprietary libmali GLES limitations.
+• Direct Display Presentation (VulkanDirect): Eliminated Weston/Wayland compositor overhead by launching armsx2-sdl directly via SDL_VIDEODRIVER=kmsdrm and VK_KHR_display (640x480@78.209 Hz), achieving native Mali-G31 hardware rendering on screen.
+• Runtime & Asset Alignment: Overrode sharun hooks to prevent duplicate ICD loading, enforced Renderer = Vulkan in PCSX2.ini to eliminate OpenGL/Zink fallbacks, and aligned bin/resources/ to resolve SPIR-V shader compilation.
+
+3. Current Status & Next Steps
+
+• Completed: Full hardware-accelerated Mali-G31 Vulkan video output operational on R36S under ArkOS.
+• Final Integration: Apply direct SDL-0 (GO-Super Gamepad) button mappings and force ALSA audio (SDL_AUDIODRIVER=alsa / BackendName = alsa) in PCSX2.ini to complete playable controls and sound.
