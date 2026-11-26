@@ -1,3 +1,6 @@
+This repository has been halted due to driver compatibility constraint, (lack of vulkan surface layers) for newer fork goto to this url instead for latest progress 
+https://github.com/b3479761/Porting-ARMSX2-SDL-TO-R36S-ARKOS-FULL-SPEED
+
 Port ARMSX2 to R36S on ARKOS2.0
 
 ARMSX2 successfully port to ARKOS2.0 with GPU malisx2 custom driver acceleration, fps went from 8 fps to 45 fps, most of the titles tested have nearly full speed.
